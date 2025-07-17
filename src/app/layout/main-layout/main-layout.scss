@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 60px 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar content";
+  height: 100vh;
+}
+
+.header {
+  grid-area: header;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+}
+
+.content {
+  grid-area: content;
+  padding: 2rem;
+  background-color: #fff;
+  overflow-y: auto;
+}

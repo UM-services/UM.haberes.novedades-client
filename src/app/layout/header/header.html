@@ -1,0 +1,9 @@
+<header class="app-header">
+  <div class="header-title">
+    <h1>Módulo de Novedades</h1>
+  </div>
+  <div class="header-user" *ngIf="userName">
+    <span>Bienvenido, {{ userName }}</span>
+    <button (click)="logout()">Salir</button>
+  </div>
+</header>

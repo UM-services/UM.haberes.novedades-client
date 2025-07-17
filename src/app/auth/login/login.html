@@ -1,0 +1,37 @@
+<div class="login-container">
+  <div class="login-box">
+    <h2>Iniciar Sesión</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="input-group">
+        <label for="legajo">Legajo</label>
+        <input
+          id="legajo"
+          type="text"
+          formControlName="legajo"
+          (input)="onLegajoChange()"
+          placeholder="Ingrese su legajo"
+        >
+      </div>
+
+      <div class="user-name" *ngIf="nombreUsuario">
+        <p>Hola, {{ nombreUsuario }}</p>
+      </div>
+
+      <div class="input-group">
+        <label for="contrasena">Contraseña</label>
+        <input
+          id="contrasena"
+          type="password"
+          formControlName="contrasena"
+          placeholder="Ingrese su contraseña"
+        >
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid">Ingresar</button>
+
+      <div *ngIf="errorMessage" class="error-message">
+        <p>{{ errorMessage }}</p>
+      </div>
+    </form>
+  </div>
+</div>
