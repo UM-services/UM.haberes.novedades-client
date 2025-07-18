@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -21,30 +22,66 @@ export class LoginComponent {
     contrasena: ['', Validators.required]
   });
 
-  errorMessage: string | null = null;
-  nombreUsuario: string | null = null;
+  errorMessage: WritableSignal<string | null> = signal(null);
+  nombreUsuario: WritableSignal<string | null> = signal(null);
+  apellidoUsuario: WritableSignal<string | null> = signal(null);
+  isLoading: WritableSignal<boolean> = signal(false);
 
-  onLegajoChange() {
-    const legajo = this.loginForm.get('legajo')?.value;
-    if (legajo) {
-      // Simulamos la obtención del nombre
-      this.nombreUsuario = 'Juan Perez (Simulado)';
-    } else {
-      this.nombreUsuario = null;
-    }
+  constructor() {
+    this.onLegajoChange();
+  }
+
+  private onLegajoChange(): void {
+    this.loginForm.get('legajo')!.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => {
+        this.nombreUsuario.set(null);
+        this.apellidoUsuario.set(null);
+        this.errorMessage.set(null);
+        this.isLoading.set(true);
+      }),
+      switchMap(legajo => this.authService.getPersonData(legajo!))
+    ).subscribe(result => {
+      this.isLoading.set(false);
+      if (result.nombre && result.apellido) {
+        this.nombreUsuario.set(result.nombre);
+        this.apellidoUsuario.set(result.apellido);
+      } else if (result.nombre) {
+        this.nombreUsuario.set(result.nombre);
+        this.apellidoUsuario.set('');
+      } else {
+        this.nombreUsuario.set(null);
+        this.apellidoUsuario.set(null);
+        this.errorMessage.set(result.error || null);
+      }
+    });
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
+    if (this.loginForm.valid && this.nombreUsuario()) {
       const { legajo, contrasena } = this.loginForm.value;
-      this.authService.login(legajo!, contrasena!).subscribe(result => {
-        if (result.success) {
-          this.router.navigate(['/']);
+      const nombreCompleto = this.apellidoUsuario() && this.nombreUsuario()
+        ? `${this.apellidoUsuario()}, ${this.nombreUsuario()}`
+        : this.nombreUsuario();
+      this.isLoading.set(true);
+      this.authService.isUserValid(Number(legajo), contrasena!).subscribe(isValid => {
+        if (isValid) {
+          this.authService.login(legajo!, nombreCompleto!, contrasena!).subscribe(result => {
+            this.isLoading.set(false);
+            if (result.success) {
+              this.router.navigate(['/']);
+            } else {
+              this.errorMessage.set(result.message || 'Error en el login.');
+            }
+          });
         } else {
-          this.errorMessage = result.message || 'Error en el login.';
-          this.nombreUsuario = null;
+          this.isLoading.set(false);
+          this.errorMessage.set('Legajo o contraseña incorrectos.');
         }
       });
+    } else if (!this.nombreUsuario()) {
+      this.errorMessage.set('Por favor, ingrese un legajo válido.');
     }
   }
 }

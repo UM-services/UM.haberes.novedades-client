@@ -1,3 +1,32 @@
+// Estilo para alinear el input y el nombre en una sola línea
+.login-legajo-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name-inline {
+  font-weight: 500;
+  color: #2a3b4d;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.spinner-inline {
+  margin-left: 0.5rem;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ccc;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 .login-container {
   display: flex;
   justify-content: center;
@@ -56,6 +85,32 @@
   border-radius: 4px;
   color: #004085;
   text-align: center;
+}
+
+.user-name-container {
+  min-height: 50px; /* Reserve space to prevent layout shifts */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #007bff;
+  animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 button {
