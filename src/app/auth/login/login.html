@@ -2,19 +2,18 @@
   <div class="login-box">
     <h2>Iniciar Sesión</h2>
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <div class="input-group">
+      <div class="input-group login-legajo-row">
         <label for="legajo">Legajo</label>
         <input
           id="legajo"
           type="text"
           formControlName="legajo"
-          (input)="onLegajoChange()"
           placeholder="Ingrese su legajo"
         >
-      </div>
-
-      <div class="user-name" *ngIf="nombreUsuario">
-        <p>Hola, {{ nombreUsuario }}</p>
+        <span *ngIf="isLoading()" class="spinner-inline"></span>
+        <span *ngIf="!isLoading() && nombreUsuario()" class="user-name-inline">
+          {{ apellidoUsuario() }}, {{ nombreUsuario() }}
+        </span>
       </div>
 
       <div class="input-group">
@@ -27,10 +26,10 @@
         >
       </div>
 
-      <button type="submit" [disabled]="loginForm.invalid">Ingresar</button>
+      <button type="submit" [disabled]="loginForm.invalid || !nombreUsuario() || isLoading()">Ingresar</button>
 
-      <div *ngIf="errorMessage" class="error-message">
-        <p>{{ errorMessage }}</p>
+      <div *ngIf="errorMessage()" class="error-message">
+        <p>{{ errorMessage() }}</p>
       </div>
     </form>
   </div>
